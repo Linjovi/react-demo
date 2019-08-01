@@ -1,18 +1,25 @@
 import React from "react";
 import { Table } from "antd";
 import Repo from "@/api/repo";
+import { useSelector, useDispatch } from "react-redux";
+import * as actionCreators from "@/store/actions";
 
-export function RepoList(props:any){
-  const [repos, setRepos] = React.useState([]);
+export function RepoList(props: any) {
   const columns = [
     {
       title: "Name",
       dataIndex: "name"
-      // render: text => <a href="javascript:;">{text}</a>,
     },
     {
       title: "Url",
       dataIndex: 'gitInfo.remote "origin".url'
+    },
+    {
+      title: "status",
+      dataIndex: "status",
+      render: (text: string) => (
+        <span className={text === "success" ? "success" : "error"}>{text}</span>
+      )
     }
   ];
   const rowSelection = {
@@ -22,18 +29,29 @@ export function RepoList(props:any){
       //   "selectedRows: ",
       //   selectedRows
       // );
-      let newSelects:any = []
-      selectedRows.forEach((element:any) => {
-        newSelects.push(element.name)
+      let newSelects: any = [];
+      selectedRows.forEach((element: any) => {
+        newSelects.push(element.name);
       });
-      props.callback(newSelects)
+      props.callback(newSelects);
     }
   };
-  React.useEffect(() => {
+
+  const repos = useSelector((state: any) => {
+    return state._repos;
+  });
+
+  const dispatch = useDispatch();
+
+  const initFetch = React.useCallback(() => {
     Repo.getRepos(props.repoPath).then(res => {
-      setRepos(res.data);
+      dispatch(actionCreators.getRepos(res.data));
     });
-  }, [props.repoPath]);
+  }, [dispatch, props.repoPath]);
+
+  React.useEffect(() => {
+    initFetch();
+  }, [initFetch]);
 
   return (
     <div className="repoList">

@@ -32,3 +32,10 @@
     transform: rotate(360deg);
   }
 }
+
+.success{
+  color:green;
+}
+.error {
+  color:red;
+}
